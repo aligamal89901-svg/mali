@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.example.mali"
-    compileSdk = 35
+    compileSdk = 36  // <--- تم التغيير هنا إلى 36
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
