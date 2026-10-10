@@ -41,18 +41,21 @@ class _ProductListPageState extends State<ProductListPage> {
     }
 
     final bytes = ExcelService.exportProducts(products);
-    final tempDir = await _getTempDirectory();
-    final file = File('${tempDir.path}/products_${DateTime.now().millisecondsSinceEpoch}.xlsx');
-    await file.writeAsBytes(bytes);
+    // استخدام XFile.fromData المتوافق مع الويب والأندرويد بدون dart:io
+    final xFile = XFile.fromData(
+      bytes,
+      name: 'products_${DateTime.now().millisecondsSinceEpoch}.xlsx',
+      mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
 
-    await Share.shareXFiles([XFile(file.path)], subject: 'تصدير المنتجات - مالي');
+    await Share.shareXFiles([xFile], subject: 'تصدير المنتجات - مالي');
     
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('تم تصدير ${products.length} منتج بنجاح'),
-        backgroundColor: const Color(0xFF4CAF50),
+      const SnackBar(
+        content: Text('تم تصدير المنتجات بنجاح'),
+        backgroundColor: Color(0xFF4CAF50),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
       ),
     );
   }
@@ -74,7 +77,6 @@ class _ProductListPageState extends State<ProductListPage> {
         return;
       }
 
-      // تأكيد الاستيراد
       final confirmed = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
@@ -101,7 +103,7 @@ class _ProductListPageState extends State<ProductListPage> {
             content: Text('تم استيراد $importedCount منتج بنجاح'),
             backgroundColor: const Color(0xFF4CAF50),
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
           ),
         );
       }
@@ -158,9 +160,7 @@ class _ProductListPageState extends State<ProductListPage> {
                   borderSide: BorderSide.none,
                 ),
               ),
-              onChanged: (value) {
-                // يمكن إضافة منطق البحث هنا لاحقاً
-              },
+              onChanged: (value) {},
             ),
           ),
           Expanded(
@@ -219,11 +219,5 @@ class _ProductListPageState extends State<ProductListPage> {
         ],
       ),
     );
-  }
-
-  Future<Directory> _getTempDirectory() async {
-    // For web, we'll use a different approach
-    // This is a simplified version
-    return Directory.systemTemp;
   }
 }

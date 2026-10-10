@@ -7,7 +7,6 @@ class ExcelService {
     final excel = Excel.createExcel();
     final sheet = excel['المنتجات'];
 
-    // Headers
     sheet.appendRow([
       TextCellValue('الباركود'),
       TextCellValue('اسم المنتج'),
@@ -16,7 +15,6 @@ class ExcelService {
       TextCellValue('الكمية'),
     ]);
 
-    // Products
     for (var product in products) {
       sheet.appendRow([
         TextCellValue(product.barcode),
@@ -32,7 +30,8 @@ class ExcelService {
 
   static Uint8List exportProducts(List<Product> products) {
     final excel = _createExcel(products);
-    return excel.encode()!;
+    // التصحيح هنا: تحويل List<int> إلى Uint8List
+    return Uint8List.fromList(excel.encode()!);
   }
 
   static List<Product> importProducts(Uint8List fileBytes) {
@@ -40,7 +39,6 @@ class ExcelService {
     final sheet = excel.tables.values.first;
     final products = <Product>[];
 
-    // Skip header row (index 0)
     for (var i = 1; i < sheet.rows.length; i++) {
       final row = sheet.rows[i];
       if (row.length >= 5) {
@@ -61,7 +59,6 @@ class ExcelService {
         }
       }
     }
-
     return products;
   }
 }
